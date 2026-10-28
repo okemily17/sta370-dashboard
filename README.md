@@ -1,8 +1,9 @@
 # sta370-dashboard
 
-#What is this
+##What is this
 Driving Safety dashboard 
-#Where did the data come from
+
+##Where did the data come from
 New Jersey table 6, New Jersey Fatalities by person type, Traffic Safety Facts: New Jersey 2020-2024, State Traffic Safety Information, FARS NHTSA
  Downloaded 10/27 from https://cdan.dot.gov/stsi/stsi.htm
  
