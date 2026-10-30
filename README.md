@@ -9,10 +9,10 @@ New Jersey table 6, New Jersey Fatalities by person type, Traffic Safety Facts: 
  
 TSFT table 3, Traffic Safety Facts Annual Reports table, NHTSA
 Downloaded 10/27 from https://cdan.dot.gov/tsftables/tsfar.htm# 
-#How do I run it
+##How do I run it
 
-#What does each script do
+##What does each script do
 
-#What is in each folder
+##What is in each folder
 
-#Who made it and when was it last updated
+##Who made it and when was it last updated
