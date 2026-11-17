@@ -27,3 +27,4 @@ eu_data <- employment_rates %>%
   left_join(net_earnings_pps, by = c("country","year"))
 
 write_csv(eu_data,"data/eu_data_clean.csv")
+write_csv(eu_data, "app/data/eu_data_clean.csv")
