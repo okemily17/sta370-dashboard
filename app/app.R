@@ -3,6 +3,8 @@ library(tidyverse)
 library(sf)
 library(rnaturalearth)
 library(freecurrencyapi)
+library(ggiraph)
+library(patchwork)
 
 # The Data ---------------------------------------------------------------------------------------
 eu_data <- read_csv("data/eu_data_clean.csv")
@@ -45,12 +47,12 @@ ui <- fluidPage(
   
   selectInput(inputId = "map_col_value",label = "Value",choices = fill_options, selected = c("employment_rates")),
   
-  h3("Figure 1. title"),
-  plotOutput(outputId = "fig_1"),
-  p("a sentence or two saying what the figure shows."),
+  #h3("Figure 1. title"),
+  #plotOutput(outputId = "fig_1"),
+  #p("a sentence or two saying what the figure shows."),
   
   h3("Figure 2. title"),
-  plotOutput(outputId = "fig_2"),
+  girafeOutput(outputId = "fig_2"),
   p("a sentence or two saying what the figure shows."),
   
   h3("What this dashboard cannot tell you"),
@@ -64,13 +66,39 @@ coloring = "magma" # sets fill scale on map
 
 server <- function(input, output) {
   
-  output$fig_1 <- renderPlot({
+  #output$fig_1 <- renderPlot({
+    # get name of selected column, use to update title, legend, and sources 
+    # when new fill option is selected 
+   # selected_name <- names(fill_options)[fill_options == input$map_col_value]
+    # plot map of Eu countries by user selected value
+    #ggplot(eu_map_data) +
+     # geom_sf(aes(fill = .data[[input$map_col_value]]), color = "white") +
+      #scale_fill_viridis_c(name = legend_labels[[selected_name]], option = coloring, direction = -1)+
+      #coord_sf(xlim = c(-25, 50), ylim = c(35, 70), expand = FALSE) +
+      #theme_void()+
+      #theme(
+       # plot.background = element_rect(fill = 'white'),
+      #  plot.title = element_text(size = 20, face ="bold")
+      #)+
+      #labs(title = graph_title[[selected_name]],
+       #    caption = sources[[selected_name]])
+    
+  #})
+  
+  output$fig_2 <- renderGirafe({
     # get name of selected column, use to update title, legend, and sources 
     # when new fill option is selected 
     selected_name <- names(fill_options)[fill_options == input$map_col_value]
-    # plot map of Eu countries by user selected value
-    ggplot(eu_map_data) +
-      geom_sf(aes(fill = .data[[input$map_col_value]]), color = "white") +
+    # make interactive bar chart 
+    bar <- ggplot(eu_data_2025, aes(y=reorder(country,.data[[input$map_col_value]]), x= .data[[input$map_col_value]], tooltip = country, data_id = country)) +
+        geom_col_interactive(fill = "blue", color = "black") +
+        labs(title=graph_title[[selected_name]],
+             x= selected_name,
+             y= "Country",
+             caption =sources[[selected_name]])
+    # make interactive map, make sure data_id matches for linked highlighting 
+    map <- ggplot(eu_map_data) +
+      geom_sf_interactive(aes(fill = .data[[input$map_col_value]], tooltip = name, data_id = name), color = "white") +
       scale_fill_viridis_c(name = legend_labels[[selected_name]], option = coloring, direction = -1)+
       coord_sf(xlim = c(-25, 50), ylim = c(35, 70), expand = FALSE) +
       theme_void()+
@@ -81,18 +109,15 @@ server <- function(input, output) {
       labs(title = graph_title[[selected_name]],
            caption = sources[[selected_name]])
     
-  })
-  
-  output$fig_2 <- renderPlot({
-    # get name of selected column, use to update title, legend, and sources 
-    # when new fill option is selected 
-    selected_name <- names(fill_options)[fill_options == input$map_col_value]
-    bar <- ggplot(eu_data_2025, aes(y=reorder(country,.data[[input$map_col_value]]), x= .data[[input$map_col_value]], tooltip = country, data_id = country)) +
-        geom_col_interactive(fill = "blue", color = "black") +
-        labs(title=graph_title[[selected_name]],
-             x= selected_name,
-             y= "Country",
-             caption =sources[[selected_name]])
+    #plot combined charts, use patchwork to combine 
+    girafe(
+      ggobj = map + bar ,
+      width_svg = 16, # had to specify width, height, and point size to avoid error from default null value
+      height_svg = 8,
+      pointsize = 12,
+      opts_hover(css = "fill:cyan;stroke:black;cursor:pointer;"),
+      opts_selection(type = "single", css = "fill:red;stroke:black;")
+    )
   })
   
 }
