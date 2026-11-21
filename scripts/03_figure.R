@@ -12,6 +12,9 @@ library(patchwork)
 # read in data 
 eu_data <- read.csv('data/eu_data_clean.csv')
 
+employment_type <- read.csv("data/employment_type_clean.csv")
+employment_type_benchmark <- read.csv("data/employment_type_benchmark_clean.csv")
+
 eu_data_2025 <- eu_data %>%
   filter(year == 2025)
 
@@ -93,7 +96,27 @@ interactive_plot_combined <- girafe_options(
   opts_selection(type = "single", css = "fill:red;stroke:black;")
 )
 
+plot6 <- ggplot(employment_type_benchmark, aes(y=science_and_engineering_professionals , x= year, tooltip = year, data_id = year)) +
+  geom_point_interactive(hover_nearest = TRUE, size = 3) +
+  labs(title="Total percent of employees in occupation code",
+       x= "Year",
+       y= "Rate",
+       caption ="Source:Eurostat")
+
+interactive_plot_3 <- girafe(ggobj = plot6)
+
+employment_type_2025 <- employment_type %>%
+  filter(year == 2025)
+
+employment_type_chart <- ggplot(employment_type_2025, aes(y=reorder(country,science_and_engineering_professionals_percent), x= science_and_engineering_professionals_percent, tooltip = country, data_id = country)) +
+  geom_col_interactive(fill = "blue", color = "black") +
+  labs(title="2025 Percent of employees in profession ",
+      x= "Percent of Employees",
+      y= "Country",
+      caption ="Source: Eurostat Employment rates by educational attainment level")
+
+interactive_plot_4 <- girafe(ggobj = employment_type_chart)
 width = 10
 height = 8 
-#ggsave("output/NetEarning_map.png",plot1,width = width,height= height )
-#ggsave("output/Shareofrent_map.png",plot2, width= width, height = height)
+ggsave("output/NetEarning_map.png",plot1,width = width,height= height )
+ggsave("output/Shareofrent_map.png",plot2, width= width, height = height)
